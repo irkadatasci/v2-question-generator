@@ -1,0 +1,104 @@
+🧪 TEST: Extrapolación FC -> MC (Robust)
+============================================================
+INPUT FLASHCARD:
+P: Dolo vs culpa: ¿qué diferencia clave existe?
+R: El dolo no se presume y debe probarse siempre por quien lo alega.
+------------------------------
+⏳ Extrapolando...
+RAW JSON STR: {
+  "pregunta": {
+    "enunciado": "En el ámbito del derecho penal, ¿cuál de las siguientes afirmaciones describe correctamente la carga de la prueba en relación con el **dolo** frente a la **culpa**?",
+    "contexto": "Seleccione la opción que refleje el principio procesal aplicable al dolo según la mayoría de los sistemas jurídicos penales."
+  },
+  "opciones": [
+    {
+      "texto": "El dolo se presume siempre que existan indicios de negligencia grave, correspondiendo a la defensa demostrar su ausencia.",
+      "tipo": "distractor",
+      "plausibilidad": "Confunde dolo con culpa y revierte la carga de la prueba, algo común en errores conceptuales sobre imputación subjetiva."
+    },
+    {
+      "texto": "El dolo debe probarse por quien lo alega, ya que no se presume, mientras que la culpa puede inferirse de las circunstancias del hecho.",
+      "tipo": "correcta",
+      "plausibilidad": "Alinea con el principio *in dubio pro reo* y la distinción entre imputación dolosa (intencional) y culposa (negligente/imprudente)."
+    },
+    {
+      "texto": "Tanto el dolo como la culpa requieren prueba plena, pero el dolo exige además la demostración de un *animus necandi* o daño específico.",
+      "tipo": "distractor",
+      "plausibilidad": "Introduce un elemento subjetivo excesivo (ej. *animus*) que no es universal en la definición de dolo y desvía el foco de la carga probatoria."
+    },
+    {
+      "texto": "La culpa se presume si el acusado no puede demostrar su diligencia, mientras que el dolo solo se configura con confesión judicial.",
+      "tipo": "distractor",
+      "plausibilidad": "Invierte la lógica de la culpa (que sí admite presunciones) y añade un requisito procesal ficticio para el dolo (confesión judicial)."
+    }
+  ],
+  "respuesta_correcta": 1,
+  "justificacion": {
+    "base_teorica": {
+      "principio": "Principio de *in dubio pro reo* (beneficio de la duda al acusado) y carga de la prueba en el derecho penal.",
+      "fuente": "Art. 21.1 CE (España), Art. 14.1 CP (Argentina), § 261 StPO (Alemania) — todos coinciden en que el dolo no se presume y debe probarse por la acusación.",
+      "distincion_clave": {
+        "dolo": {
+          "definicion": "Conducta con **conciencia y voluntad** del resultado típico.",
+          "carga_proba": "Debe ser **demostrado por quien lo alega** (acusación).",
+          "ejemplo": "Matar a alguien con intención premeditada."
+        },
+        "culpa": {
+          "definicion": "Resultado típico por **incumplimiento del deber objetivo de cuidado** (negligencia/imprudencia).",
+          "carga_proba": "Puede **inferirse de las circunstancias** (presunciones *homines diligens*).",
+          "ejemplo": "Atropellar a un peatón por exceso de velocidad en zona escolar."
+        }
+      }
+    },
+    "errores_comunes": [
+      {
+        "descripcion": "Confundir dolo con culpa en la carga probatoria.",
+        "ejemplo": "Creer que la culpa también requiere prueba estricta como el dolo."
+      },
+      {
+        "descripcion": "Añadir requisitos subjetivos innecesarios al dolo (ej. *animus* específico).",
+        "ejemplo": "Exigir 'intención de matar' para todo dolo, cuando basta la conciencia del resultado típico."
+      },
+      {
+        "descripcion": "Presumir el dolo automáticamente.",
+        "ejemplo": "Afirmar que 'si hay daño, hay dolo' sin prueba de la voluntad del agente."
+      }
+    ],
+    "referencias": [
+      {
+        "autor": "Mir Puig, Santiago",
+        "obra": "Derecho Penal. Parte General",
+        "edicion": "10ª",
+        "editorial": "Civitas",
+        "pagina": 345
+      },
+      {
+        "autor": "Quintero Olivares, Gonzalo",
+        "obra": "Teoría del Delito",
+        "edicion": "5ª",
+        "editorial": "Thomson Reuters Aranzadi",
+        "pagina": 212
+      }
+    ]
+  },
+  "metadatos": {
+    "nivel_dificultad": "intermedio",
+    "area": "Derecho Penal (Teoría del Delito)",
+    "competencia_evaluada": "Comprensión de la imputación subjetiva y carga de la prueba en el proceso penal.",
+    "tipo_item": "seleccion_multiple",
+    "diseño": {
+      "estrategia_distractores": "Errores conceptuales frecuentes en estudiantes de grado (confusión dolo/culpa, carga probatoria invertida, requisitos subjetivos excesivos).",
+      "validez_de_constructo": "Mide conocimiento teórico sobre principios procesales y distinción entre tipos de imputación subjetiva."
+    }
+  }
+}
+DEBUG DATA (Normalized): {'pregunta': {'enunciado': 'En el ámbito del derecho penal, ¿cuál de las siguientes afirmaciones describe correctamente la carga de la prueba en relación con el **dolo** frente a la **culpa**?', 'contexto': 'Seleccione la opción que refleje el principio procesal aplicable al dolo según la mayoría de los sistemas jurídicos penales.'}, 'opciones': [{'texto': 'El dolo se presume siempre que existan indicios de negligencia grave, correspondiendo a la defensa demostrar su ausencia.', 'tipo': 'distractor', 'plausibilidad': 'Confunde dolo con culpa y revierte la carga de la prueba, algo común en errores conceptuales sobre imputación subjetiva.'}, {'texto': 'El dolo debe probarse por quien lo alega, ya que no se presume, mientras que la culpa puede inferirse de las circunstancias del hecho.', 'tipo': 'correcta', 'plausibilidad': 'Alinea con el principio *in dubio pro reo* y la distinción entre imputación dolosa (intencional) y culposa (negligente/imprudente).'}, {'texto': 'Tanto el dolo como la culpa requieren prueba plena, pero el dolo exige además la demostración de un *animus necandi* o daño específico.', 'tipo': 'distractor', 'plausibilidad': 'Introduce un elemento subjetivo excesivo (ej. *animus*) que no es universal en la definición de dolo y desvía el foco de la carga probatoria.'}, {'texto': 'La culpa se presume si el acusado no puede demostrar su diligencia, mientras que el dolo solo se configura con confesión judicial.', 'tipo': 'distractor', 'plausibilidad': 'Invierte la lógica de la culpa (que sí admite presunciones) y añade un requisito procesal ficticio para el dolo (confesión judicial).'}], 'respuesta_correcta': 1, 'justificacion': {'base_teorica': {'principio': 'Principio de *in dubio pro reo* (beneficio de la duda al acusado) y carga de la prueba en el derecho penal.', 'fuente': 'Art. 21.1 CE (España), Art. 14.1 CP (Argentina), § 261 StPO (Alemania) — todos coinciden en que el dolo no se presume y debe probarse por la acusación.', 'distincion_clave': {'dolo': {'definicion': 'Conducta con **conciencia y voluntad** del resultado típico.', 'carga_proba': 'Debe ser **demostrado por quien lo alega** (acusación).', 'ejemplo': 'Matar a alguien con intención premeditada.'}, 'culpa': {'definicion': 'Resultado típico por **incumplimiento del deber objetivo de cuidado** (negligencia/imprudencia).', 'carga_proba': 'Puede **inferirse de las circunstancias** (presunciones *homines diligens*).', 'ejemplo': 'Atropellar a un peatón por exceso de velocidad en zona escolar.'}}}, 'errores_comunes': [{'descripcion': 'Confundir dolo con culpa en la carga probatoria.', 'ejemplo': 'Creer que la culpa también requiere prueba estricta como el dolo.'}, {'descripcion': 'Añadir requisitos subjetivos innecesarios al dolo (ej. *animus* específico).', 'ejemplo': "Exigir 'intención de matar' para todo dolo, cuando basta la conciencia del resultado típico."}, {'descripcion': 'Presumir el dolo automáticamente.', 'ejemplo': "Afirmar que 'si hay daño, hay dolo' sin prueba de la voluntad del agente."}], 'referencias': [{'autor': 'Mir Puig, Santiago', 'obra': 'Derecho Penal. Parte General', 'edicion': '10ª', 'editorial': 'Civitas', 'pagina': 345}, {'autor': 'Quintero Olivares, Gonzalo', 'obra': 'Teoría del Delito', 'edicion': '5ª', 'editorial': 'Thomson Reuters Aranzadi', 'pagina': 212}]}, 'metadatos': {'nivel_dificultad': 'intermedio', 'area': 'Derecho Penal (Teoría del Delito)', 'competencia_evaluada': 'Comprensión de la imputación subjetiva y carga de la prueba en el proceso penal.', 'tipo_item': 'seleccion_multiple', 'diseño': {'estrategia_distractores': 'Errores conceptuales frecuentes en estudiantes de grado (confusión dolo/culpa, carga probatoria invertida, requisitos subjetivos excesivos).', 'validez_de_constructo': 'Mide conocimiento teórico sobre principios procesales y distinción entre tipos de imputación subjetiva.'}}}
+
+✅ RESULTADO MC:
+Enunciado: {'enunciado': 'En el ámbito del derecho penal, ¿cuál de las siguientes afirmaciones describe correctamente la carga de la prueba en relación con el **dolo** frente a la **culpa**?', 'contexto': 'Seleccione la opción que refleje el principio procesal aplicable al dolo según la mayoría de los sistemas jurídicos penales.'}
+Opciones:
+  ❌ 0) {'texto': 'El dolo se presume siempre que existan indicios de negligencia grave, correspondiendo a la defensa demostrar su ausencia.', 'tipo': 'distractor', 'plausibilidad': 'Confunde dolo con culpa y revierte la carga de la prueba, algo común en errores conceptuales sobre imputación subjetiva.'}
+  ✅ 1) {'texto': 'El dolo debe probarse por quien lo alega, ya que no se presume, mientras que la culpa puede inferirse de las circunstancias del hecho.', 'tipo': 'correcta', 'plausibilidad': 'Alinea con el principio *in dubio pro reo* y la distinción entre imputación dolosa (intencional) y culposa (negligente/imprudente).'}
+  ❌ 2) {'texto': 'Tanto el dolo como la culpa requieren prueba plena, pero el dolo exige además la demostración de un *animus necandi* o daño específico.', 'tipo': 'distractor', 'plausibilidad': 'Introduce un elemento subjetivo excesivo (ej. *animus*) que no es universal en la definición de dolo y desvía el foco de la carga probatoria.'}
+  ❌ 3) {'texto': 'La culpa se presume si el acusado no puede demostrar su diligencia, mientras que el dolo solo se configura con confesión judicial.', 'tipo': 'distractor', 'plausibilidad': 'Invierte la lógica de la culpa (que sí admite presunciones) y añade un requisito procesal ficticio para el dolo (confesión judicial).'}
+Justificación: {'base_teorica': {'principio': 'Principio de *in dubio pro reo* (beneficio de la duda al acusado) y carga de la prueba en el derecho penal.', 'fuente': 'Art. 21.1 CE (España), Art. 14.1 CP (Argentina), § 261 StPO (Alemania) — todos coinciden en que el dolo no se presume y debe probarse por la acusación.', 'distincion_clave': {'dolo': {'definicion': 'Conducta con **conciencia y voluntad** del resultado típico.', 'carga_proba': 'Debe ser **demostrado por quien lo alega** (acusación).', 'ejemplo': 'Matar a alguien con intención premeditada.'}, 'culpa': {'definicion': 'Resultado típico por **incumplimiento del deber objetivo de cuidado** (negligencia/imprudencia).', 'carga_proba': 'Puede **inferirse de las circunstancias** (presunciones *homines diligens*).', 'ejemplo': 'Atropellar a un peatón por exceso de velocidad en zona escolar.'}}}, 'errores_comunes': [{'descripcion': 'Confundir dolo con culpa en la carga probatoria.', 'ejemplo': 'Creer que la culpa también requiere prueba estricta como el dolo.'}, {'descripcion': 'Añadir requisitos subjetivos innecesarios al dolo (ej. *animus* específico).', 'ejemplo': "Exigir 'intención de matar' para todo dolo, cuando basta la conciencia del resultado típico."}, {'descripcion': 'Presumir el dolo automáticamente.', 'ejemplo': "Afirmar que 'si hay daño, hay dolo' sin prueba de la voluntad del agente."}], 'referencias': [{'autor': 'Mir Puig, Santiago', 'obra': 'Derecho Penal. Parte General', 'edicion': '10ª', 'editorial': 'Civitas', 'pagina': 345}, {'autor': 'Quintero Olivares, Gonzalo', 'obra': 'Teoría del Delito', 'edicion': '5ª', 'editorial': 'Thomson Reuters Aranzadi', 'pagina': 212}]}

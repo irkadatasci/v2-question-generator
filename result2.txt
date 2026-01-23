@@ -1,0 +1,21 @@
+🧪 TEST: Extrapolación FC -> MC (Con Grounding)
+============================================================
+ SOURCE TEXT:
+'El dolo consiste en la intención positiva de inferir injuria a la persona o propiedad de otro (Art. 44 CC).
+El efecto principal es que el deudor doloso responde de todos los perjuicios, tanto previstos como imprevistos, que sean consecuencia directa del incumplimiento (Art. 1558 CC).
+A diferencia de la culpa, el dolo no se puede presumir y debe probarse siempre por quien lo alega (Art. 1459 CC), salvo los casos en que la ley expresamente lo presume.'
+
+ INPUT FLASHCARD:
+P: Dolo vs culpa: ¿qué diferencia clave existe?
+R: El dolo no se presume y debe probarse siempre por quien lo alega.
+------------------------------
+⏳ Extrapolando con Grounding...
+
+✅ RESULTADO MC (Grounding Check):
+Enunciado: Según el Código Civil, ¿cuál es la diferencia clave entre el **dolo** y la **culpa** en relación con la carga de la prueba en un incumplimiento contractual?
+Opciones:
+  ❌ 0) {'texto': 'El dolo se presume siempre, mientras que la culpa debe probarse por quien alega el incumplimiento.', 'plausibilidad': 'Distractor: Invierte la relación de presunción entre dolo y culpa, ignorando que el texto establece lo contrario (Art. 1459 CC).'}
+  ❌ 1) {'texto': 'El dolo implica responder solo por perjuicios previstos, mientras que la culpa cubre tanto perjuicios previstos como imprevistos.', 'plausibilidad': 'Distractor: Confunde el efecto de la responsabilidad (Art. 1558 CC) con la carga de la prueba, sin abordar la presunción.'}
+  ❌ 2) {'texto': 'El dolo requiere intención positiva de causar daño, mientras que la culpa surge por negligencia o impericia sin intención.', 'plausibilidad': 'Distractor: Aunque describe diferencias conceptuales válidas, no responde a la pregunta sobre la **carga de la prueba**, eje central del enunciado.'}
+  ✅ 3) {'texto': 'El dolo **no se presume** y debe probarse siempre por quien lo alega, a diferencia de la culpa, que en algunos casos puede presumirse según la ley.', 'plausibilidad': 'Correcta: Refleja estrictamente el Art. 1459 CC, donde se establece que el dolo **no presume** y exige prueba expresa, a diferencia de la culpa (implícita en el texto por contraste).'}
+Justificación: {'base_legal': [{'articulo': '1459 CC', 'detalle': "Establece que **'el dolo no se presume'** y debe ser probado por quien lo alega. Esto contrasta con la culpa, que en algunos casos la ley **puede presumir** (ejemplo implícito en el texto: 'salvo los casos en que la ley expresamente lo presume')."}], 'exclusion_distractores': [{'opcion': 0, 'razon': "Viola el Art. 1459 CC, que **prohíbe presumir el dolo**. El texto es explícito: *'el dolo no se puede presumir'*."}, {'opcion': 1, 'razon': 'Desvía el foco hacia los **efectos de la responsabilidad** (Art. 1558 CC), no hacia la carga de la prueba. La pregunta exige comparar **presunción vs prueba**, no alcances dañosos.'}, {'opcion': 2, 'razon': 'Aunque describe una diferencia real (Art. 44 CC: dolo = *intención positiva*), no aborda el **mecanismo probatorio**, eje de la pregunta. El texto prioriza la presunción/probación (Art. 1459 CC).'}], 'contexto_relevante': {'dolo': {'definicion': 'Intención positiva de causar daño (Art. 44 CC).', 'carga_proba': 'Debe probarse siempre (Art. 1459 CC).', 'efecto': 'Responsabilidad por **todos los perjuicios** (previstos/imprevistos) (Art. 1558 CC).'}, 'culpa': {'presuncion': "Puede presumirse en casos expresos por la ley (Art. 1459 CC: *'salvo los casos en que la ley expresamente lo presume'* —implícito que **no siempre requiere prueba expresa**)."}}}
