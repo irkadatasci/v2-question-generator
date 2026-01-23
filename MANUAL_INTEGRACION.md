@@ -6,17 +6,11 @@ Este documento explica el flujo de trabajo completo para generar contenido de al
 
 ## 🏗 Arquitectura del Flujo
 
-```mermaid
-graph TD
-    A[PDF Origen] -->|1. Ingesta| B(v2-question-generator)
-    B -->|2. Split & Clean| C{LLM Processing}
-    C -->|3. Prompt V2.0| D[Flashcards Atómicas]
-    C -->|4. Extrapolación| E[Multiple Choice Complejo]
-    D & E -->|5. JSON Output| F[archivo_preguntas.json]
-    F -->|6. Import CLI| G(lexquest-web / spacy_mapper)
-    G -->|7. Normalización| H[(PostgreSQL Database)]
-    H -->|8. Review Queue| I[Admin Dashboard]
-```
+## 🏗 Arquitectura del Flujo (Visual)
+
+![LexQuest Data Pipeline Infographic](lexquest_data_pipeline_infographic.png)
+
+*El diagrama muestra el viaje del contenido desde el PDF crudo hasta el Dashboard de Administración.*
 
 ---
 
