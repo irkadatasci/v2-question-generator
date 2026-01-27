@@ -105,18 +105,40 @@ class ConfigLoader:
         llm_providers = {}
         llm_config = config.get("llm", {})
 
-        for provider in ["kimi", "groq", "openai", "ollama", "ollama_cloud"]:
+        # Define a mapping for environment variables for each provider
+        # (API_KEY_ENV_VAR, MODEL_ENV_VAR, BASE_URL_ENV_VAR)
+        provider_env_map = {
+            "kimi": ("MOONSHOT_API_KEY", "MOONSHOT_MODEL", "MOONSHOT_BASE_URL"),
+            "groq": ("GROQ_API_KEY", "GROQ_MODEL", None),
+            "openai": ("OPENAI_API_KEY", "OPENAI_MODEL", None),
+            "ollama": ("OLLAMA_HOST", "OLLAMA_MODEL", "OLLAMA_HOST"), # Ollama uses OLLAMA_HOST for base_url
+            "ollama_cloud": ("OLLAMA_CLOUD_API_KEY", "OLLAMA_CLOUD_MODEL", "OLLAMA_CLOUD_URL"),
+            "lmstudio": ("LMSTUDIO_API_KEY", "LMSTUDIO_MODEL", "LMSTUDIO_URL"), # Added LMStudio
+        }
+
+        for provider, env_vars_tuple in provider_env_map.items():
+            api_key_env_var, model_env_var, base_url_env_var = env_vars_tuple
+            
             provider_config = llm_config.get(provider, {})
 
-            # Obtener API key desde env o config
-            env_var = self.ENV_VARS.get(provider, "")
-            api_key = os.getenv(env_var, provider_config.get("api_key", ""))
+            # Get API key from env or config
+            api_key = os.getenv(api_key_env_var, provider_config.get("api_key", ""))
+            
+            # Get model from env or config
+            model = os.getenv(model_env_var, provider_config.get("model", ""))
+
+            # Get base_url from env or config
+            base_url = None
+            if base_url_env_var:
+                base_url = os.getenv(base_url_env_var, provider_config.get("base_url"))
+            else:
+                base_url = provider_config.get("base_url")
 
             llm_providers[provider] = LLMSettings(
                 provider=provider,
                 api_key=api_key,
-                model=provider_config.get("model", ""),
-                base_url=provider_config.get("base_url"),
+                model=model,
+                base_url=base_url,
                 temperature=provider_config.get("temperature", 0.7),
                 max_tokens=provider_config.get("max_tokens", 4096),
                 timeout=provider_config.get("timeout", 120),

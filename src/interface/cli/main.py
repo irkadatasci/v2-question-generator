@@ -188,8 +188,8 @@ Ejemplos:
         )
         pipeline_parser.add_argument(
             "--provider", "-p",
-            choices=["kimi", "groq", "openai", "ollama", "ollama_cloud"],
-            help="Proveedor de LLM",
+            choices=["kimi", "groq", "openai", "ollama", "ollama_cloud", "lmstudio"],
+            help="Proveedor de LLM (por defecto: kimi)",
         )
         pipeline_parser.add_argument(
             "--skip",

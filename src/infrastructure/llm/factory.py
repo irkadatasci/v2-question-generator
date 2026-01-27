@@ -11,6 +11,7 @@ from .backends.groq import GroqBackend
 from .backends.openai import OpenAIBackend
 from .backends.ollama import OllamaBackend
 from .backends.ollama_cloud import OllamaCloudBackend
+from .backends.lmstudio import LMStudioBackend
 
 
 class LLMProvider(Enum):
@@ -20,6 +21,7 @@ class LLMProvider(Enum):
     OPENAI = "openai"
     OLLAMA = "ollama"
     OLLAMA_CLOUD = "ollama_cloud"
+    LMSTUDIO = "lmstudio"
 
 
 class LLMFactory:
@@ -41,6 +43,7 @@ class LLMFactory:
         LLMProvider.OPENAI: OpenAIBackend,
         LLMProvider.OLLAMA: OllamaBackend,
         LLMProvider.OLLAMA_CLOUD: OllamaCloudBackend,
+        LLMProvider.LMSTUDIO: LMStudioBackend,
     }
 
     @classmethod
@@ -137,6 +140,7 @@ class LLMFactory:
             LLMProvider.OPENAI: OpenAIBackend.DEFAULT_MODEL,
             LLMProvider.OLLAMA: OllamaBackend.DEFAULT_MODEL,
             LLMProvider.OLLAMA_CLOUD: OllamaCloudBackend.DEFAULT_MODEL,
+            LLMProvider.LMSTUDIO: LMStudioBackend.DEFAULT_MODEL,
         }
         return defaults.get(provider, "")
 
@@ -151,6 +155,11 @@ class LLMFactory:
         Returns:
             Lista de modelos disponibles
         """
+        # Para LMStudio, como no tenemos lista estática, intentamos devolver
+        # una lista genérica si no está instanciado.
+        if provider == LLMProvider.LMSTUDIO:
+             return [LMStudioBackend.DEFAULT_MODEL, "local-model"]
+
         models_map = {
             LLMProvider.KIMI: list(KimiBackend.MODELS.keys()),
             LLMProvider.GROQ: list(GroqBackend.MODELS.keys()),
