@@ -28,7 +28,7 @@ class PipelineStageResult:
 class RunPipelineRequest:
     """Request para ejecutar el pipeline completo."""
     pdf_path: Path
-    question_type: QuestionType
+    question_types: List[QuestionType]  # Changed from single type to list
 
     # Parámetros de extracción (Etapa 1)
     save_extraction_csv: bool = True
@@ -86,7 +86,7 @@ class RunPipelineUseCase:
     Orquesta las 4 etapas del pipeline:
     1. Extracción de secciones del PDF
     2. Clasificación semántica de secciones
-    3. Generación de preguntas con LLM
+    3. Generación de preguntas con LLM (soporta múltiples tipos)
     4. Validación de preguntas generadas
 
     Este caso de uso actúa como facade para el pipeline completo,
@@ -173,20 +173,25 @@ class RunPipelineUseCase:
                     output_paths["classification_csv"] = classify_result.details["output_csv"]
 
             # ═══════════════════════════════════════════════════════════
-            # ETAPA 3: GENERACIÓN DE PREGUNTAS
+            # ETAPA 3: GENERACIÓN DE PREGUNTAS (MULTI-TIPO)
             # ═══════════════════════════════════════════════════════════
             if "generate" not in request.skip_stages:
-                generate_result = self._run_generation(request, document_id)
-                stages.append(generate_result)
+                
+                # Iterar sobre cada tipo de pregunta solicitado
+                for q_type in request.question_types:
+                    print(f"\nGenerando preguntas de tipo: {q_type.value.upper()}")
+                    generate_result = self._run_generation(request, document_id, q_type)
+                    stages.append(generate_result)
 
-                if not generate_result.success and request.stop_on_error:
-                    return self._build_error_result(
-                        stages, start_time,
-                        f"Pipeline falló en generación: {generate_result.error_message}"
-                    )
+                    if not generate_result.success and request.stop_on_error:
+                        return self._build_error_result(
+                            stages, start_time,
+                            f"Pipeline falló en generación de {q_type.value}: {generate_result.error_message}"
+                        )
 
-                if generate_result.details.get("output_json"):
-                    output_paths["generation_json"] = generate_result.details["output_json"]
+                    if generate_result.details.get("output_json"):
+                        # Guardar ruta con sufijo del tipo para diferenciar
+                        output_paths[f"generation_json_{q_type.value}"] = generate_result.details["output_json"]
 
             # ═══════════════════════════════════════════════════════════
             # ETAPA 4: VALIDACIÓN DE PREGUNTAS
@@ -208,6 +213,11 @@ class RunPipelineUseCase:
             # RESULTADO FINAL
             # ═══════════════════════════════════════════════════════════
             total_time = (datetime.now() - start_time).total_seconds()
+            
+            # Calcular totales acumulados de todas las etapas de generación
+            total_gen_questions = sum(s.details.get("questions_generated", 0) for s in stages if s.stage_name.startswith("generate"))
+            total_tokens = sum(s.details.get("tokens_used", 0) for s in stages if s.stage_name.startswith("generate"))
+            total_cost = sum(s.details.get("cost_usd", 0.0) for s in stages if s.stage_name.startswith("generate"))
 
             return RunPipelineResult(
                 success=True,
@@ -215,10 +225,10 @@ class RunPipelineUseCase:
                 stages=stages,
                 total_sections=self._get_stage_detail(stages, "extract", "total_sections", 0),
                 sections_relevant=self._get_stage_detail(stages, "classify", "sections_relevant", 0),
-                questions_generated=self._get_stage_detail(stages, "generate", "questions_generated", 0),
+                questions_generated=total_gen_questions,
                 questions_valid=self._get_stage_detail(stages, "validate", "valid_questions", 0),
-                total_tokens=self._get_stage_detail(stages, "generate", "tokens_used", 0),
-                total_cost_usd=self._get_stage_detail(stages, "generate", "cost_usd", 0.0),
+                total_tokens=total_tokens,
+                total_cost_usd=total_cost,
                 total_execution_time_seconds=total_time,
                 output_paths=output_paths,
             )
@@ -329,13 +339,14 @@ class RunPipelineUseCase:
         self,
         request: RunPipelineRequest,
         document_id: str,
+        question_type: QuestionType,
     ) -> PipelineStageResult:
         """Ejecuta la etapa de generación."""
         stage_start = datetime.now()
 
         generate_request = GenerateQuestionsRequest(
             document_id=document_id,
-            question_type=request.question_type,
+            question_type=question_type,
             batch_size=request.batch_size,
             only_relevant=request.only_relevant,
             auto_adjust_batch_size=request.auto_adjust_batch_size,
@@ -346,7 +357,7 @@ class RunPipelineUseCase:
         stage_time = (datetime.now() - stage_start).total_seconds()
 
         return PipelineStageResult(
-            stage_name="generate",
+            stage_name=f"generate_{question_type.value}",
             success=result.success,
             execution_time_seconds=stage_time,
             details={
@@ -398,13 +409,14 @@ class RunPipelineUseCase:
     def _get_stage_detail(
         self,
         stages: List[PipelineStageResult],
-        stage_name: str,
+        stage_name_prefix: str,
         key: str,
         default,
     ):
-        """Obtiene un detalle de una etapa específica."""
-        for stage in stages:
-            if stage.stage_name == stage_name:
+        """Obtiene un detalle de una etapa específica (o la última coincidente)."""
+        # Buscar en orden inverso para obtener el último resultado (ej: validación final)
+        for stage in reversed(stages):
+            if stage.stage_name.startswith(stage_name_prefix):
                 return stage.details.get(key, default)
         return default
 

@@ -54,7 +54,14 @@ class GenerateCommand:
             print(f"   Configure la variable de entorno correspondiente")
             return 1
 
-        q_type = QuestionType(question_type)
+        try:
+            q_type = QuestionType[question_type.upper()]
+        except KeyError:
+            try:
+                q_type = QuestionType(question_type)
+            except ValueError:
+                print(f"❌ Tipo de pregunta desconocido: {question_type}")
+                return 1
         print(f"🤖 Generando preguntas tipo '{question_type}'")
         print(f"   Proveedor: {provider}")
         print(f"   Modelo: {llm_settings.model or 'default'}")

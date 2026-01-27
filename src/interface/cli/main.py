@@ -182,9 +182,9 @@ Ejemplos:
         pipeline_parser.add_argument("pdf", type=Path, help="Archivo PDF")
         pipeline_parser.add_argument(
             "--type", "-t",
-            choices=["flashcard", "true_false", "multiple_choice", "cloze"],
+            choices=["flashcard", "true_false", "multiple_choice", "cloze", "all"],
             default="flashcard",
-            help="Tipo de pregunta",
+            help="Tipo de pregunta (o 'all' para generar todos los tipos)",
         )
         pipeline_parser.add_argument(
             "--provider", "-p",

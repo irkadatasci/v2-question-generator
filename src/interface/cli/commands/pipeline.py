@@ -50,7 +50,7 @@ class PipelineCommand:
 
         Args:
             pdf_path: Ruta al PDF
-            question_type: Tipo de pregunta
+            question_type: Tipo de pregunta (o "all")
             provider: Proveedor de LLM
             skip_stages: Etapas a omitir
             output_dir: Directorio de salida
@@ -77,10 +77,26 @@ class PipelineCommand:
             print(f"❌ Proveedor {provider} no está configurado")
             return 1
 
-        q_type = QuestionType(question_type)
+        # Resolver tipos de preguntas
+        q_types = []
+        if question_type.lower() == "all":
+            q_types = [
+                QuestionType.FLASHCARD,
+                QuestionType.TRUE_FALSE,
+                QuestionType.MULTIPLE_CHOICE
+            ]
+        else:
+            try:
+                q_types = [QuestionType[question_type.upper()]]
+            except KeyError:
+                try:
+                    q_types = [QuestionType(question_type)]
+                except ValueError:
+                    print(f"❌ Tipo de pregunta desconocido: {question_type}")
+                    return 1
 
         print(f"\n📄 PDF: {pdf_path.name}")
-        print(f"📝 Tipo: {question_type}")
+        print(f"📝 Tipos: {[t.value for t in q_types]}")
         print(f"🤖 LLM: {provider}")
         print(f"⏭️  Skip: {skip_stages or 'ninguna'}")
 
@@ -145,6 +161,8 @@ class PipelineCommand:
 
             except Exception as e:
                 print(f"   ❌ Error inicializando LLM: {e}")
+                import traceback
+                traceback.print_exc()
                 return 1
 
         generate_uc = GenerateQuestionsUseCase(
@@ -174,7 +192,7 @@ class PipelineCommand:
 
         request = RunPipelineRequest(
             pdf_path=pdf_path,
-            question_type=q_type,
+            question_types=q_types,
             threshold_relevant=self._settings.classification.threshold_relevant,
             batch_size=self._settings.generation.default_batch_size,
             auto_adjust_batch_size=self._settings.generation.auto_adjust_batch_size,
@@ -204,7 +222,7 @@ class PipelineCommand:
                 print(f"   Secciones: {stage.details.get('total_sections', 0)}")
             elif stage.stage_name == "classify":
                 print(f"   Relevantes: {stage.details.get('sections_relevant', 0)}")
-            elif stage.stage_name == "generate":
+            elif stage.stage_name.startswith("generate"):
                 print(f"   Preguntas: {stage.details.get('questions_generated', 0)}")
                 print(f"   Costo: ${stage.details.get('cost_usd', 0):.4f}")
             elif stage.stage_name == "validate":
