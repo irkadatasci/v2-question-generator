@@ -294,64 +294,70 @@ class GenerateQuestionsUseCase:
         Parsea la respuesta del LLM y crea objetos Question.
 
         Este método debe ser robusto para manejar diferentes formatos
-        de respuesta del LLM.
+        de respuesta del LLM, incluyendo modelos de razonamiento (Thinking).
         """
         print(f"=== PARSING DEBUG ===")
-        print(f"Content received: {content}")
-        print(f"Content type: {type(content)}")
         
         questions = []
 
         # Si el contenido es string, intentar parsear como JSON
         if isinstance(content, str):
+            # 1. Limpiar etiquetas de razonamiento (Thinking models como DeepSeek o Ministral)
+            if "<thought>" in content:
+                import re
+                print("Detected <thought> tags, removing them...")
+                content = re.sub(r'<thought>.*?</thought>', '', content, flags=re.DOTALL)
+            
+            # 2. Intentar parseo directo
+            processed_content = None
             try:
-                print(f"Trying to parse as JSON string...")
-                content = json.loads(content)
-                print(f"Successfully parsed JSON: {content}")
-            except json.JSONDecodeError as e:
-                print(f"JSON decode error: {e}")
-                # Intentar extraer JSON de markdown
+                processed_content = json.loads(content.strip())
+            except json.JSONDecodeError:
+                # 3. Intentar extraer de bloques markdown
+                json_str = ""
                 if "```json" in content:
-                    print(f"Found ```json in content, extracting...")
                     json_str = content.split("```json")[1].split("```")[0]
-                    try:
-                        content = json.loads(json_str)
-                        print(f"Successfully parsed JSON from markdown: {content}")
-                    except json.JSONDecodeError as e2:
-                        print(f"Failed to parse JSON from markdown: {e2}")
-                        return []
                 elif "```" in content:
-                    print(f"Found ``` in content, extracting...")
                     json_str = content.split("```")[1].split("```")[0]
+                
+                if json_str:
                     try:
-                        content = json.loads(json_str)
-                        print(f"Successfully parsed JSON from ```: {content}")
-                    except json.JSONDecodeError as e2:
-                        print(f"Failed to parse JSON from ```: {e2}")
-                        return []
+                        processed_content = json.loads(json_str.strip())
+                    except json.JSONDecodeError:
+                        processed_content = None
                 else:
-                    print(f"No markdown code blocks found, returning empty")
-                    return []
-        else:
-            print(f"Content is not a string, type: {type(content)}")
+                    # 4. Búsqueda agresiva de { ... } o [ ... ]
+                    import re
+                    # Buscar el bloque JSON más grande
+                    match = re.search(r'(\{.*\}|\[.*\])', content, re.DOTALL)
+                    if match:
+                        try:
+                            processed_content = json.loads(match.group(0))
+                        except json.JSONDecodeError:
+                            processed_content = None
+                    else:
+                        processed_content = None
 
-        print(f"Content after parsing: {content}")
-        print(f"Content type after parsing: {type(content)}")
-
+            if processed_content is None:
+                print(f"Failed to parse content as JSON: {content[:200]}...")
+                return []
+            content = processed_content
+        
         # Extraer lista de preguntas
         if isinstance(content, dict):
-            print(f"Content is dict, checking for 'preguntas' key...")
-            preguntas_raw = content.get("preguntas", [])
-            print(f"Found preguntas_raw: {preguntas_raw}")
+            # Buscar en 'preguntas', 'questions' o si el dict mismo contiene una lista
+            preguntas_raw = content.get("preguntas", content.get("questions", []))
+            if not preguntas_raw and any(isinstance(v, list) for v in content.values()):
+                # Si no hay 'preguntas', pero hay alguna lista, tomar la primera
+                for v in content.values():
+                    if isinstance(v, list):
+                        preguntas_raw = v
+                        break
         elif isinstance(content, list):
-            print(f"Content is list, using as preguntas_raw...")
             preguntas_raw = content
-            print(f"Using list as preguntas_raw: {preguntas_raw}")
         else:
-            print(f"Content is neither dict nor list, returning empty")
+            print(f"Content is neither dict nor list after parsing")
             return []
-
-        print(f"Total raw questions found: {len(preguntas_raw)}")
 
         if not preguntas_raw:
             print("No questions found in content")
@@ -363,10 +369,8 @@ class GenerateQuestionsUseCase:
 
         for i, preg in enumerate(preguntas_raw):
             try:
-                print(f"Processing question {i+1}: {preg}")
-                
                 # Construir Origin
-                origen_data = preg.get("origen", {})
+                origen_data = preg.get("origen", preg.get("origin", {}))
                 origin = Origin.from_dict({
                     "document_id": document_id,
                     **origen_data,
@@ -378,60 +382,48 @@ class GenerateQuestionsUseCase:
                 )
 
                 # Crear Question según tipo
-                contenido = preg.get("contenido_tipo", {})
-
-                print(f"Question type: {question_type}")
-                print(f"Contenido: {contenido}")
+                # Buscar contenido en 'contenido_tipo', 'content' o usar la raíz
+                contenido = preg.get("contenido_tipo", preg.get("content", preg))
 
                 if question_type == QuestionType.FLASHCARD:
-                    print("Creating flashcard question...")
                     question = Question.create_flashcard(
-                        anverso=contenido.get("anverso", contenido.get("frente", preg.get("pregunta", ""))),
-                        reverso=contenido.get("reverso", preg.get("respuesta", "")),
+                        anverso=contenido.get("anverso", contenido.get("frente", contenido.get("front", preg.get("pregunta", "")))),
+                        reverso=contenido.get("reverso", contenido.get("back", preg.get("respuesta", "")),),
                         origin=origin,
                         metadata=metadata,
                     )
                 elif question_type == QuestionType.TRUE_FALSE:
-                    print("Creating true/false question...")
                     question = Question.create_true_false(
-                        pregunta=contenido.get("pregunta", contenido.get("afirmacion", preg.get("pregunta", ""))),
-                        respuesta_correcta=contenido.get("respuesta_correcta", contenido.get("respuesta", True)),
-                        explicacion=contenido.get("explicacion", contenido.get("justificacion", "")),
+                        pregunta=contenido.get("pregunta", contenido.get("afirmacion", contenido.get("question", contenido.get("statement", "")))),
+                        respuesta_correcta=contenido.get("respuesta_correcta", contenido.get("respuesta", contenido.get("correct_answer", True))),
+                        explicacion=contenido.get("explicacion", contenido.get("justificacion", contenido.get("explanation", ""))),
                         origin=origin,
                         metadata=metadata,
                     )
                 elif question_type == QuestionType.MULTIPLE_CHOICE:
-                    print("Creating multiple choice question...")
                     question = Question.create_multiple_choice(
-                        pregunta=contenido.get("pregunta", preg.get("pregunta", "")),
-                        opciones=contenido.get("opciones", []),
-                        respuesta_correcta=contenido.get("respuesta_correcta", 0),
+                        pregunta=contenido.get("pregunta", contenido.get("question", preg.get("pregunta", ""))),
+                        opciones=contenido.get("opciones", contenido.get("options", [])),
+                        respuesta_correcta=contenido.get("respuesta_correcta", contenido.get("correct_answer", 0)),
                         origin=origin,
                         metadata=metadata,
-                        explicacion=contenido.get("explicacion", contenido.get("justificacion", "")),
+                        explicacion=contenido.get("explicacion", contenido.get("explanation", "")),
                     )
                 elif question_type == QuestionType.CLOZE:
-                    print("Creating cloze question...")
                     question = Question.create_cloze(
-                        texto_con_espacios=contenido.get("texto_con_espacios", preg.get("pregunta", "")),
-                        respuestas_validas=contenido.get("respuestas_validas", []),
+                        texto_con_espacios=contenido.get("texto_con_espacios", contenido.get("text", "")),
+                        respuestas_validas=contenido.get("respuestas_validas", contenido.get("answers", [])),
                         origin=origin,
                         metadata=metadata,
                     )
                 else:
-                    print(f"Unknown question type: {question_type}")
                     continue
 
-                print(f"Successfully created question: {question}")
                 questions.append(question)
 
             except Exception as e:
                 print(f"Error creating question {i+1}: {e}")
-                import traceback
-                traceback.print_exc()
-                # Skip preguntas mal formadas
                 continue
 
         print(f"Total questions created: {len(questions)}")
-        print(f"=== END PARSING DEBUG ===")
         return questions

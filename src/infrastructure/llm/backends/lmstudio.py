@@ -39,6 +39,19 @@ class LMStudioBackend(OpenAIBackend):
             timeout=self._config.timeout,
         )
 
+    def _call_api(
+        self,
+        prompt: str,
+        system_prompt: str,
+        response_format: str,
+    ):
+        """
+        Realiza la llamada a la API. 
+        Forzamos response_format a None para evitar errores 400 en servidores locales
+        que no soportan json_object, confiando en nuestro parser robusto.
+        """
+        return super()._call_api(prompt, system_prompt, response_format=None)
+
     def estimate_cost(self, tokens_prompt: int, tokens_completion: int) -> float:
         """Costo cero para ejecución local."""
         return 0.0

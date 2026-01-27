@@ -29,8 +29,8 @@ class LLMSettings:
 
     def is_configured(self) -> bool:
         """Verifica si el proveedor está configurado."""
-        # Ollama no requiere API key
-        if self.provider == "ollama":
+        # Ollama y LMStudio no requieren API key mandatoria
+        if self.provider in ["ollama", "lmstudio"]:
             return True
         return bool(self.api_key)
 
