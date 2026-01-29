@@ -44,6 +44,7 @@ class PipelineCommand:
         provider: Optional[str] = None,
         skip_stages: List[str] = None,
         output_dir: Optional[Path] = None,
+        author: Optional[str] = None,
     ) -> int:
         """
         Ejecuta el pipeline completo.
@@ -54,6 +55,7 @@ class PipelineCommand:
             provider: Proveedor de LLM
             skip_stages: Etapas a omitir
             output_dir: Directorio de salida
+            author: Autor del documento (opcional)
 
         Returns:
             Código de salida
@@ -99,6 +101,8 @@ class PipelineCommand:
         print(f"📝 Tipos: {[t.value for t in q_types]}")
         print(f"🤖 LLM: {provider}")
         print(f"⏭️  Skip: {skip_stages or 'ninguna'}")
+        if author:
+            print(f"✍️  Autor: {author} (Atribución dinámica activada)")
 
         # Crear todos los servicios
         print("\n📦 Inicializando servicios...")
@@ -151,6 +155,7 @@ class PipelineCommand:
 
                 prompt_service = PromptServiceImpl(
                     prompts_path=self._settings.paths.prompts_dir,
+                    author=author,
                 )
 
                 print("   ✓ Verificando conexión LLM...")

@@ -32,15 +32,19 @@ class PromptServiceImpl(PromptService):
         self,
         prompts_path: Path,
         include_context: bool = True,
+        author: Optional[str] = None,
     ):
         """
         Args:
             prompts_path: Ruta al directorio de prompts
-            include_context: Si incluir contexto en prompts construidos
+            include_context: (Deprecated) Si incluir contexto
+            author: Autor del documento para atribución dinámica
         """
         self._prompts_path = Path(prompts_path)
         self._loader = PromptLoader(self._prompts_path)
-        self._builder = PromptBuilder(include_context)
+        self.author = author
+        # PromptBuilder now expects (templates_dir, author)
+        self._builder = PromptBuilder(self._prompts_path, self.author)
 
         # Cache de prompts cargados
         self._cache: Dict[str, str] = {}
@@ -52,11 +56,9 @@ class PromptServiceImpl(PromptService):
     ) -> str:
         """
         Obtiene el system prompt para un tipo de pregunta.
-
         Args:
             question_type: Tipo de pregunta
             version: Versión específica (None = activa)
-
         Returns:
             System prompt
         """
@@ -79,16 +81,15 @@ class PromptServiceImpl(PromptService):
     ) -> str:
         """
         Construye el user prompt con las secciones.
-
         Args:
             sections: Lista de secciones a procesar
             question_type: Tipo de pregunta
-            include_context: Si incluir contexto adicional
-
+            include_context: (Deprecated) Si incluir contexto adicional
         Returns:
             User prompt construido
         """
-        builder = PromptBuilder(include_context)
+        # Instantiate builder with correct args
+        builder = PromptBuilder(self._prompts_path, self.author)
         return builder.build(sections, question_type)
 
     def get_available_versions(self, question_type: QuestionType) -> List[str]:

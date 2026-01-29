@@ -155,6 +155,10 @@ Ejemplos:
             default=5,
             help="Tamaño de batch",
         )
+        generate_parser.add_argument(
+            "--author",
+            help="Nombre del autor para atribución en preguntas",
+        )
 
         # Comando: validate
         validate_parser = subparsers.add_parser(
@@ -203,6 +207,10 @@ Ejemplos:
             type=Path,
             help="Directorio de salida",
         )
+        pipeline_parser.add_argument(
+            "--author",
+            help="Nombre del autor para atribución en preguntas",
+        )
 
         # Comando: config
         config_parser = subparsers.add_parser(
@@ -250,6 +258,7 @@ Ejemplos:
                 parsed.type,
                 parsed.provider,
                 parsed.batch_size,
+                parsed.author,  # Pass author argument
             )
 
         elif command == "validate":
@@ -268,6 +277,7 @@ Ejemplos:
                 parsed.provider,
                 parsed.skip,
                 parsed.output,
+                parsed.author,  # Pass author argument
             )
 
         elif command == "config":

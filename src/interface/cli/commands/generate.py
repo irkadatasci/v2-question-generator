@@ -32,6 +32,7 @@ class GenerateCommand:
         question_type: str,
         provider: Optional[str] = None,
         batch_size: int = 5,
+        author: Optional[str] = None,
     ) -> int:
         """
         Ejecuta la generación de preguntas.
@@ -41,6 +42,7 @@ class GenerateCommand:
             question_type: Tipo de pregunta
             provider: Proveedor de LLM
             batch_size: Tamaño de batch
+            author: Autor del documento (opcional)
 
         Returns:
             Código de salida
@@ -66,6 +68,8 @@ class GenerateCommand:
         print(f"   Proveedor: {provider}")
         print(f"   Modelo: {llm_settings.model or 'default'}")
         print(f"   Documento: {document_id}")
+        if author:
+            print(f"   ✍️  Autor: {author} (Atribución dinámica activada)")
 
         # Crear servicios
         try:
@@ -83,6 +87,7 @@ class GenerateCommand:
 
         prompt_service = PromptServiceImpl(
             prompts_path=self._settings.paths.prompts_dir,
+            author=author,
         )
 
         section_repo = SectionRepositoryCSV(

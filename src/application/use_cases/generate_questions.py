@@ -371,6 +371,28 @@ class GenerateQuestionsUseCase:
             try:
                 # Construir Origin
                 origen_data = preg.get("origen", preg.get("origin", {}))
+                
+                # FIX: Mapear section_id relativo (1..N) del batch a section_id absoluto de la DB
+                # El LLM ve "Sección 1", "Sección 2" en el prompt, por lo que devuelve 1, 2...
+                raw_section_id = origen_data.get("section_id")
+                
+                if isinstance(raw_section_id, int) and sections:
+                    # Ajustar índice (1-based a 0-based)
+                    idx = raw_section_id - 1
+                    if 0 <= idx < len(sections):
+                        real_section = sections[idx]
+                        origen_data["section_id"] = real_section.id
+                        # También podemos corregir la página si el LLM alucinó
+                        if not origen_data.get("page") and real_section.page:
+                            origen_data["page"] = real_section.page
+                    else:
+                        # Si el índice está fuera de rango, por defecto usar la primera del batch
+                        # Esto previene errores si el LLM alucina un índice 99
+                        origen_data["section_id"] = sections[0].id
+                elif sections and ("section_id" not in origen_data or not origen_data["section_id"]):
+                    # Si no viene section_id, asignar a la primera del batch por defecto
+                    origen_data["section_id"] = sections[0].id
+
                 origin = Origin.from_dict({
                     "document_id": document_id,
                     **origen_data,
