@@ -85,7 +85,8 @@ class PipelineCommand:
             q_types = [
                 QuestionType.FLASHCARD,
                 QuestionType.TRUE_FALSE,
-                QuestionType.MULTIPLE_CHOICE
+                QuestionType.MULTIPLE_CHOICE,
+                QuestionType.CLOZE
             ]
         else:
             try:

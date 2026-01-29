@@ -16,6 +16,14 @@ class PromptBuilder:
     de manera óptima para el LLM.
     """
 
+    # Mapeo de QuestionType a nombre de directorio
+    TYPE_TO_DIR = {
+        QuestionType.FLASHCARD: "flashcard",
+        QuestionType.TRUE_FALSE: "true_false",
+        QuestionType.MULTIPLE_CHOICE: "multiple_choice",
+        QuestionType.CLOZE: "cloze",
+    }
+
     # Templates por tipo de pregunta para el contenido de las secciones
     SECTION_TEMPLATES = {
         QuestionType.FLASHCARD: """
@@ -114,12 +122,15 @@ Reglas de Estilo:
             # Si falla (ej 'all'), usar un default seguro para templates de sección
             q_type_enum = QuestionType.FLASHCARD
 
-        # 1. Cargar el System Prompt del tipo específico (v2.0)
-        type_template = self._load_template(f"{question_type}/v2.0.md")
+        # 1. Resolver nombre de directorio
+        dir_name = self.TYPE_TO_DIR.get(q_type_enum, question_type)
+
+        # 2. Cargar el System Prompt del tipo específico (v2.0)
+        type_template = self._load_template(f"{dir_name}/v2.0.md")
         
         # Fallback para cloze v1.0
-        if not type_template and question_type == "cloze":
-             type_template = self._load_template(f"{question_type}/v1.0.md")
+        if not type_template and dir_name == "cloze":
+             type_template = self._load_template(f"{dir_name}/v1.0.md")
 
         if not type_template:
             # Si no hay archivo, usar un template mínimo por defecto para evitar crash
