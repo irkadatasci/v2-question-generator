@@ -25,6 +25,7 @@ class GenerateQuestionsRequest:
     auto_adjust_batch_size: bool = True
     save_batches: bool = True
     experiment_tags: Optional[dict] = None
+    source_filename: str = ""
 
 
 @dataclass
@@ -173,6 +174,7 @@ class GenerateQuestionsUseCase:
                         request.question_type,
                         batch.sections,
                         request.document_id,
+                        request.source_filename,
                     )
 
                     # DEBUG: Print parsing results
@@ -289,6 +291,7 @@ class GenerateQuestionsUseCase:
         question_type: QuestionType,
         sections: List[Section],
         document_id: str,
+        source_filename: str = "",
     ) -> List[Question]:
         """
         Parsea la respuesta del LLM y crea objetos Question.
@@ -395,6 +398,7 @@ class GenerateQuestionsUseCase:
 
                 origin = Origin.from_dict({
                     "document_id": document_id,
+                    "fuente": source_filename,
                     **origen_data,
                 })
 

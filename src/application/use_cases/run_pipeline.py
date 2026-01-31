@@ -351,6 +351,7 @@ class RunPipelineUseCase:
             only_relevant=request.only_relevant,
             auto_adjust_batch_size=request.auto_adjust_batch_size,
             experiment_tags=request.experiment_tags,
+            source_filename=request.pdf_path.name,
         )
 
         result = self._generate.execute(generate_request)
