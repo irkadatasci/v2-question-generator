@@ -330,7 +330,12 @@ class ValidateQuestionsUseCase:
 
         elif question.type.value == "cloze":
             # Validar cloze
-            if "{{c1::" not in content.text_with_blanks and "_____" not in content.text_with_blanks:
+            import re
+            holes_anki = len(re.findall(r'\{\{c\d+::', content.text_with_blanks))
+            holes_underscore = content.text_with_blanks.count("_____")
+            total_holes = max(holes_anki, holes_underscore)
+
+            if total_holes == 0:
                 issues.append(ValidationIssue(
                     question_id=question.id,
                     field="content.text_with_blanks",
@@ -339,6 +344,16 @@ class ValidateQuestionsUseCase:
                     severity="error",
                     auto_fixable=False,
                 ))
+            elif total_holes > 1:
+                issues.append(ValidationIssue(
+                    question_id=question.id,
+                    field="content.text_with_blanks",
+                    issue_type="too_many_holes",
+                    message=f"Demasiados espacios en blanco ({total_holes}). Solo se permite 1.",
+                    severity="error",
+                    auto_fixable=False,
+                ))
+
             if not content.valid_answers:
                 issues.append(ValidationIssue(
                     question_id=question.id,
